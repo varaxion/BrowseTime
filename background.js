@@ -51,7 +51,7 @@ async function _processStateChange(updates = {}) {
   
   // 1. Calculate and aggregate elapsed time using PREVIOUS state
   const wasEffectivelyActive = sessionState.activeDomain && 
-                               sessionState.windowFocused && 
+                               (sessionState.windowFocused || isPopupOpen) && 
                                (!sessionState.isIdle || sessionState.isActiveTabAudible);
 
   if (wasEffectivelyActive) {
@@ -118,22 +118,16 @@ let isPopupOpen = false;
 chrome.runtime.onConnect.addListener((port) => {
   if (port.name === 'popup') {
     isPopupOpen = true;
-    processStateChange({ windowFocused: true });
+    processStateChange();
     
-    port.onDisconnect.addListener(async () => {
+    port.onDisconnect.addListener(() => {
       isPopupOpen = false;
-      try {
-        const win = await chrome.windows.getLastFocused();
-        processStateChange({ windowFocused: win && win.focused });
-      } catch (e) {
-        processStateChange({ windowFocused: false });
-      }
+      processStateChange();
     });
   }
 });
 
 chrome.windows.onFocusChanged.addListener((windowId) => {
-  if (isPopupOpen) return;
   const isFocused = (windowId !== chrome.windows.WINDOW_ID_NONE);
   processStateChange({ windowFocused: isFocused });
 });

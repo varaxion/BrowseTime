@@ -37,7 +37,8 @@ async function renderUI() {
   const totals = { ...state.totals };
   
   let activeElapsed = 0;
-  const isEffectivelyActive = state.activeDomain && state.windowFocused && (!state.isIdle || state.isActiveTabAudible);
+  // If the popup is actively executing, we know the user is focused on the extension.
+  const isEffectivelyActive = state.activeDomain && (!state.isIdle || state.isActiveTabAudible);
   
   if (isEffectivelyActive) {
     activeElapsed = Math.floor((now - state.lastTimestamp) / 1000);
