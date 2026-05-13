@@ -58,29 +58,58 @@ async function renderUI() {
   const maxTime = sortedDomains.length > 0 ? totals[sortedDomains[0]] : 1;
 
   const statsContainer = document.getElementById('statsContainer');
-  statsContainer.innerHTML = '';
   
   if (sortedDomains.length === 0) {
     statsContainer.innerHTML = '<div style="color: var(--text-muted); font-size: 13px; text-align: center; padding: 20px 0;">No active browsing yet.</div>';
+    return;
   }
 
-  sortedDomains.forEach(domain => {
+  // Remove the empty message if it exists
+  if (statsContainer.querySelector('div[style*="text-align: center"]')) {
+    statsContainer.innerHTML = '';
+  }
+
+  sortedDomains.forEach((domain, index) => {
     const time = totals[domain];
     const percentage = Math.max((time / maxTime) * 100, 2);
     
-    const statItem = document.createElement('div');
-    statItem.className = 'stat-item';
+    let statItem = document.getElementById(`domain-${domain}`);
     
-    statItem.innerHTML = `
-      <div class="stat-header">
-        <span class="stat-domain">${domain}</span>
-        <span class="stat-time">${formatStatTime(time)}</span>
-      </div>
-      <div class="stat-bar-bg">
-        <div class="stat-bar-fill" style="width: ${percentage}%"></div>
-      </div>
-    `;
-    statsContainer.appendChild(statItem);
+    if (!statItem) {
+      statItem = document.createElement('div');
+      statItem.className = 'stat-item';
+      statItem.id = `domain-${domain}`;
+      statItem.innerHTML = `
+        <div class="stat-header">
+          <span class="stat-domain">${domain}</span>
+          <span class="stat-time" id="time-${domain}">${formatStatTime(time)}</span>
+        </div>
+        <div class="stat-bar-bg">
+          <div class="stat-bar-fill" id="bar-${domain}" style="width: 0%"></div>
+        </div>
+      `;
+      statsContainer.appendChild(statItem);
+      
+      // Trigger reflow to ensure the transition animates from 0
+      void statItem.offsetWidth;
+    }
+    
+    // Update data
+    document.getElementById(`time-${domain}`).innerText = formatStatTime(time);
+    document.getElementById(`bar-${domain}`).style.width = `${percentage}%`;
+    
+    // Ensure correct ordering
+    if (statsContainer.children[index] !== statItem) {
+      statsContainer.insertBefore(statItem, statsContainer.children[index]);
+    }
+  });
+  
+  // Remove missing domains
+  Array.from(statsContainer.children).forEach(child => {
+    const childDomain = child.id.replace('domain-', '');
+    if (!totals[childDomain] && child.className === 'stat-item') {
+      child.remove();
+    }
   });
 }
 
