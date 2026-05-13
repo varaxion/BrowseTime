@@ -2,10 +2,19 @@ let updateInterval;
 
 async function fetchState() {
   const data = await chrome.storage.session.get('sessionState');
-  return data.sessionState || { totals: {}, activeDomain: null, isIdle: false, windowFocused: true, isActiveTabAudible: false, lastTimestamp: Date.now() };
+  return data.sessionState || { 
+    totals: {}, 
+    activeDomain: null, 
+    isIdle: false, 
+    windowFocused: true, 
+    isActiveTabAudible: false, 
+    lastTimestamp: Date.now(),
+    sessionStartTime: Date.now()
+  };
 }
 
-function formatLiveTime(seconds) {
+// Single precision formatting function 
+function formatTime(seconds) {
   const h = Math.floor(seconds / 3600);
   const m = Math.floor((seconds % 3600) / 60);
   const s = seconds % 60;
@@ -13,15 +22,6 @@ function formatLiveTime(seconds) {
   if (h > 0) return `${h}h ${m}m ${s}s`;
   if (m > 0) return `${m}m ${s}s`;
   return `${s}s`;
-}
-
-function formatStatTime(seconds) {
-  const h = Math.floor(seconds / 3600);
-  const m = Math.floor((seconds % 3600) / 60);
-  
-  if (h > 0) return `${h}h ${m}m`;
-  if (m > 0) return `${m}m`;
-  return `< 1m`;
 }
 
 async function renderUI() {
@@ -43,15 +43,30 @@ async function renderUI() {
     totalSessionSeconds += totals[domain];
   }
 
-  document.getElementById('totalTime').innerText = formatStatTime(totalSessionSeconds);
+  document.getElementById('totalTime').innerText = formatTime(totalSessionSeconds);
+
+  // Format session start time
+  const startTime = new Date(state.sessionStartTime || now);
+  document.getElementById('sessionStart').innerText = `Started: ${startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
 
   const activeContainer = document.getElementById('activeIndicator');
+  activeContainer.style.display = 'flex'; // Always visible now
+
   if (isEffectivelyActive) {
-    activeContainer.style.display = 'flex';
     document.getElementById('activeDomain').innerText = state.activeDomain;
-    document.getElementById('activeTime').innerText = formatLiveTime(totals[state.activeDomain] || 0);
+    document.getElementById('activeDomain').style.color = 'var(--text-main)';
+    document.getElementById('activeTime').innerText = formatTime(totals[state.activeDomain] || 0);
   } else {
-    activeContainer.style.display = 'none';
+    // If tracking is paused or looking at an internal page
+    if (state.activeDomain) {
+      document.getElementById('activeDomain').innerText = `${state.activeDomain} (Paused)`;
+      document.getElementById('activeDomain').style.color = 'var(--text-muted)';
+      document.getElementById('activeTime').innerText = formatTime(totals[state.activeDomain] || 0);
+    } else {
+      document.getElementById('activeDomain').innerText = `Untracked page`;
+      document.getElementById('activeDomain').style.color = 'var(--text-muted)';
+      document.getElementById('activeTime').innerText = `-`;
+    }
   }
 
   const sortedDomains = Object.keys(totals).sort((a, b) => totals[b] - totals[a]);
@@ -82,7 +97,7 @@ async function renderUI() {
       statItem.innerHTML = `
         <div class="stat-header">
           <span class="stat-domain">${domain}</span>
-          <span class="stat-time" id="time-${domain}">${formatStatTime(time)}</span>
+          <span class="stat-time" id="time-${domain}">${formatTime(time)}</span>
         </div>
         <div class="stat-bar-bg">
           <div class="stat-bar-fill" id="bar-${domain}" style="width: 0%"></div>
@@ -95,7 +110,7 @@ async function renderUI() {
     }
     
     // Update data
-    document.getElementById(`time-${domain}`).innerText = formatStatTime(time);
+    document.getElementById(`time-${domain}`).innerText = formatTime(time);
     document.getElementById(`bar-${domain}`).style.width = `${percentage}%`;
     
     // Ensure correct ordering
@@ -107,7 +122,8 @@ async function renderUI() {
   // Remove missing domains
   Array.from(statsContainer.children).forEach(child => {
     const childDomain = child.id.replace('domain-', '');
-    if (!totals[childDomain] && child.className === 'stat-item') {
+    // Using explicit undefined check to prevent elements with 0 seconds from disappearing
+    if (totals[childDomain] === undefined && child.className === 'stat-item') {
       child.remove();
     }
   });

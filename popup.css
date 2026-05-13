@@ -32,11 +32,16 @@ header h1 {
   font-weight: 600;
   color: var(--text-main);
   letter-spacing: 0.5px;
-  text-transform: lowercase;
 }
 header h1::before {
   content: '■ ';
   color: var(--accent);
+}
+
+.session-start {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 4px;
 }
 
 .active-indicator {

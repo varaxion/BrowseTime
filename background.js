@@ -1,7 +1,7 @@
-// State structure
 let sessionState = {
   activeDomain: null,
   lastTimestamp: Date.now(),
+  sessionStartTime: Date.now(),
   totals: {},
   isIdle: false,
   windowFocused: true,
@@ -14,6 +14,7 @@ async function loadState() {
   const data = await chrome.storage.session.get('sessionState');
   if (data.sessionState) {
     sessionState = data.sessionState;
+    if (!sessionState.sessionStartTime) sessionState.sessionStartTime = Date.now();
     // Process any time that elapsed while service worker was suspended
     await processStateChange();
   } else {
@@ -114,6 +115,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'reset_session') {
     sessionState.totals = {};
     sessionState.lastTimestamp = Date.now();
+    sessionState.sessionStartTime = Date.now();
     saveState().then(() => sendResponse({success: true}));
     return true; // indicates async response
   }

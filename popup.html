@@ -10,9 +10,10 @@
   <div class="container">
     <header>
       <h1>BrowseTime</h1>
+      <div class="session-start" id="sessionStart">Started: ...</div>
     </header>
 
-    <div class="active-indicator" id="activeIndicator" style="display: none;">
+    <div class="active-indicator" id="activeIndicator">
       <span class="label">Currently active</span>
       <div class="domain">
         <span id="activeDomain">...</span>
@@ -27,7 +28,7 @@
     <footer>
       <div class="total-time">
         <span>Total active:</span>
-        <span id="totalTime">0m</span>
+        <span id="totalTime">0s</span>
       </div>
       <button id="resetBtn">Reset Session</button>
     </footer>
