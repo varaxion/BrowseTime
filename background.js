@@ -4,7 +4,8 @@ let sessionState = {
   lastTimestamp: Date.now(),
   totals: {},
   isIdle: false,
-  windowFocused: true
+  windowFocused: true,
+  isActiveTabAudible: false
 };
 
 const IDLE_DETECTION_INTERVAL = 60; // 60 seconds
@@ -40,12 +41,15 @@ function getDomain(url) {
 async function processStateChange() {
   const now = Date.now();
   
+  const isEffectivelyActive = sessionState.activeDomain && 
+                              sessionState.windowFocused && 
+                              (!sessionState.isIdle || sessionState.isActiveTabAudible);
+
   // 1. Calculate and aggregate elapsed time
-  if (sessionState.activeDomain && !sessionState.isIdle && sessionState.windowFocused) {
+  if (isEffectivelyActive) {
     const elapsedSeconds = Math.floor((now - sessionState.lastTimestamp) / 1000);
     
     // Safety limit: if elapsed time is unrealistically large (> 24 hours), ignore it
-    // This prevents adding huge chunks of time if OS slept without triggering idle
     if (elapsedSeconds > 0 && elapsedSeconds < 86400) {
       if (!sessionState.totals[sessionState.activeDomain]) {
         sessionState.totals[sessionState.activeDomain] = 0;
@@ -54,22 +58,26 @@ async function processStateChange() {
     }
   }
 
-  // 2. Determine new active domain
+  // 2. Determine new active domain and audible state
   let newDomain = null;
+  let newAudible = false;
   
-  if (!sessionState.isIdle && sessionState.windowFocused) {
-    try {
-      const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
-      if (tabs.length > 0 && !tabs[0].incognito) {
+  try {
+    const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (tabs.length > 0 && !tabs[0].incognito) {
+      newAudible = tabs[0].audible || false;
+      
+      if (sessionState.windowFocused && (!sessionState.isIdle || newAudible)) {
         newDomain = getDomain(tabs[0].url);
       }
-    } catch (e) {
-      console.error("Error querying tabs:", e);
     }
+  } catch (e) {
+    console.error("Error querying tabs:", e);
   }
 
   // 3. Update state
   sessionState.activeDomain = newDomain;
+  sessionState.isActiveTabAudible = newAudible;
   sessionState.lastTimestamp = now;
   
   await saveState();
@@ -79,7 +87,7 @@ async function processStateChange() {
 chrome.tabs.onActivated.addListener(() => processStateChange());
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  if (tab.active && changeInfo.url) {
+  if (tab.active && (changeInfo.url !== undefined || changeInfo.audible !== undefined)) {
     processStateChange();
   }
 });
