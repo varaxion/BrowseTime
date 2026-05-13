@@ -10,19 +10,21 @@ let sessionState = {
 
 const IDLE_DETECTION_INTERVAL = 60; // 60 seconds
 
+let isInitialized = false;
+let initPromise = loadState();
+
 async function loadState() {
   const data = await chrome.storage.session.get('sessionState');
   if (data.sessionState) {
     sessionState = data.sessionState;
     if (!sessionState.sessionStartTime) sessionState.sessionStartTime = Date.now();
-    // Process any time that elapsed while service worker was suspended
-    await processStateChange();
+    await _processStateChange();
   } else {
-    // First run
     chrome.idle.setDetectionInterval(IDLE_DETECTION_INTERVAL);
     sessionState.lastTimestamp = Date.now();
-    await processStateChange();
+    await _processStateChange();
   }
+  isInitialized = true;
 }
 
 async function saveState() {
@@ -40,6 +42,11 @@ function getDomain(url) {
 }
 
 async function processStateChange(updates = {}) {
+  if (!isInitialized) await initPromise;
+  return _processStateChange(updates);
+}
+
+async function _processStateChange(updates = {}) {
   const now = Date.now();
   
   // 1. Calculate and aggregate elapsed time using PREVIOUS state
@@ -67,18 +74,22 @@ async function processStateChange(updates = {}) {
     sessionState.isIdle = updates.isIdle;
   }
 
-  // 3. Determine new active domain and audible state
-  let newDomain = null;
-  let newAudible = false;
+  // 3. Determine new active domain and audible state safely
+  let newDomain = sessionState.activeDomain; // Prevent false wipes if query fails
+  let newAudible = sessionState.isActiveTabAudible;
   
   try {
     // Get the last focused normal window (ignores extension popups)
     const window = await chrome.windows.getLastFocused({ populate: true, windowTypes: ['normal'] });
     if (window && window.tabs) {
       const activeTab = window.tabs.find(t => t.active);
-      if (activeTab && !activeTab.incognito) {
-        newAudible = activeTab.audible || false;
-        newDomain = getDomain(activeTab.url);
+      if (activeTab) {
+        if (!activeTab.incognito) {
+          newAudible = activeTab.audible || false;
+          newDomain = getDomain(activeTab.url);
+        } else {
+          newDomain = null;
+        }
       }
     }
   } catch (e) {
@@ -141,6 +152,3 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     return true; // indicates async response
   }
 });
-
-// Initialize
-loadState();
