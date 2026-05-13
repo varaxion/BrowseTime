@@ -64,13 +64,10 @@ async function processStateChange() {
   let newAudible = false;
   
   try {
-    const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+    const tabs = await chrome.tabs.query({ active: true, lastFocusedWindow: true, windowType: 'normal' });
     if (tabs.length > 0 && !tabs[0].incognito) {
       newAudible = tabs[0].audible || false;
-      
-      if (sessionState.windowFocused && (!sessionState.isIdle || newAudible)) {
-        newDomain = getDomain(tabs[0].url);
-      }
+      newDomain = getDomain(tabs[0].url);
     }
   } catch (e) {
     console.error("Error querying tabs:", e);
