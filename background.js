@@ -110,5 +110,14 @@ chrome.idle.onStateChanged.addListener((newState) => {
   processStateChange();
 });
 
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === 'reset_session') {
+    sessionState.totals = {};
+    sessionState.lastTimestamp = Date.now();
+    saveState().then(() => sendResponse({success: true}));
+    return true; // indicates async response
+  }
+});
+
 // Initialize
 loadState();
