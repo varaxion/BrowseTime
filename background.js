@@ -102,7 +102,27 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   }
 });
 
+let isPopupOpen = false;
+
+chrome.runtime.onConnect.addListener((port) => {
+  if (port.name === 'popup') {
+    isPopupOpen = true;
+    processStateChange({ windowFocused: true });
+    
+    port.onDisconnect.addListener(async () => {
+      isPopupOpen = false;
+      try {
+        const win = await chrome.windows.getLastFocused();
+        processStateChange({ windowFocused: win && win.focused });
+      } catch (e) {
+        processStateChange({ windowFocused: false });
+      }
+    });
+  }
+});
+
 chrome.windows.onFocusChanged.addListener((windowId) => {
+  if (isPopupOpen) return;
   const isFocused = (windowId !== chrome.windows.WINDOW_ID_NONE);
   processStateChange({ windowFocused: isFocused });
 });

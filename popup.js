@@ -1,3 +1,4 @@
+const port = chrome.runtime.connect({ name: 'popup' });
 let updateInterval;
 
 async function fetchState() {
