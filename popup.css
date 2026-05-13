@@ -197,7 +197,6 @@ footer {
   font-family: inherit;
   cursor: pointer;
   transition: all 0.2s ease;
-  text-transform: uppercase;
   letter-spacing: 1px;
 }
 
@@ -213,7 +212,6 @@ footer {
   text-align: center;
   margin-top: -4px;
   letter-spacing: 1px;
-  text-transform: uppercase;
 }
 
 .credits a {

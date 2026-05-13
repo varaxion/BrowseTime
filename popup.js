@@ -53,7 +53,7 @@ async function renderUI() {
 
   // Format session start time
   const startTime = new Date(state.sessionStartTime || now);
-  document.getElementById('sessionStart').innerText = `INIT: ${startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}`;
+  document.getElementById('sessionStart').innerText = `Init: ${startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}`;
 
   const activeContainer = document.getElementById('activeIndicator');
 
@@ -64,11 +64,11 @@ async function renderUI() {
   } else {
     // If tracking is paused or looking at an internal page
     if (state.activeDomain) {
-      document.getElementById('activeDomain').innerText = `${state.activeDomain} [PAUSED]`;
+      document.getElementById('activeDomain').innerText = `${state.activeDomain} [Paused]`;
       document.getElementById('activeDomain').style.color = 'var(--text-muted)';
       document.getElementById('activeTime').innerText = formatTime(totals[state.activeDomain] || 0);
     } else {
-      document.getElementById('activeDomain').innerText = `[UNTRACKED]`;
+      document.getElementById('activeDomain').innerText = `[Untracked]`;
       document.getElementById('activeDomain').style.color = 'var(--text-muted)';
       document.getElementById('activeTime').innerText = `-`;
     }
@@ -90,7 +90,7 @@ async function renderUI() {
   const statsContainer = document.getElementById('statsContainer');
   
   if (sortedDomains.length === 0) {
-    statsContainer.innerHTML = '<div style="color: var(--text-muted); font-size: 11px; text-align: center; padding: 20px 0;">[ NO_DATA_DETECTED ]</div>';
+    statsContainer.innerHTML = '<div style="color: var(--text-muted); font-size: 11px; text-align: center; padding: 20px 0;">[ No Data Detected ]</div>';
     return;
   }
 
