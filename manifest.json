@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "BrowseTime",
   "version": "0.1.0",
-  "description": "A minimal, privacy-first browser session tracker.",
+  "description": "Privacy-first browser awareness. Track time, not people.",
   "permissions": [
     "tabs",
     "idle",
