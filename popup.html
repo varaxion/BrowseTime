@@ -9,14 +9,23 @@
 <body>
   <div class="container">
     <header>
-      <h1>BrowseTime</h1>
-      <div class="session-start" id="sessionStart">Started: ...</div>
+      <div class="header-main">
+        <h1>BrowseTime</h1>
+        <div class="session-start" id="sessionStart">INIT: ...</div>
+      </div>
+      <div class="sort-controls">
+        <select id="sortSelect" class="cyber-select">
+          <option value="timeDesc">TIME (DESC)</option>
+          <option value="timeAsc">TIME (ASC)</option>
+          <option value="alpha">A-Z</option>
+        </select>
+      </div>
     </header>
 
     <div class="active-indicator" id="activeIndicator">
-      <span class="label">Currently active</span>
+      <span class="label">[ LIVE MONITORING ]</span>
       <div class="domain">
-        <span id="activeDomain">...</span>
+        <span id="activeDomain" class="neon-text">...</span>
         <span class="time" id="activeTime">0s</span>
       </div>
     </div>
@@ -27,10 +36,10 @@
 
     <footer>
       <div class="total-time">
-        <span>Total active:</span>
-        <span id="totalTime">0s</span>
+        <span>[TOTAL_ACTIVE]</span>
+        <span id="totalTime" class="neon-text">0s</span>
       </div>
-      <button id="resetBtn">Reset Session</button>
+      <button id="resetBtn" class="cyber-btn">KILL_SESSION</button>
     </footer>
   </div>
   <script src="popup.js"></script>

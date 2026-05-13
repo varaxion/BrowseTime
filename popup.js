@@ -1,5 +1,11 @@
 const port = chrome.runtime.connect({ name: 'popup' });
 let updateInterval;
+let currentSort = 'timeDesc';
+
+document.getElementById('sortSelect').addEventListener('change', (e) => {
+  currentSort = e.target.value;
+  renderUI();
+});
 
 async function fetchState() {
   const data = await chrome.storage.session.get('sessionState');
@@ -14,7 +20,6 @@ async function fetchState() {
   };
 }
 
-// Single precision formatting function 
 function formatTime(seconds) {
   const h = Math.floor(seconds / 3600);
   const m = Math.floor((seconds % 3600) / 60);
@@ -48,35 +53,44 @@ async function renderUI() {
 
   // Format session start time
   const startTime = new Date(state.sessionStartTime || now);
-  document.getElementById('sessionStart').innerText = `Started: ${startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}`;
+  document.getElementById('sessionStart').innerText = `INIT: ${startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}`;
 
   const activeContainer = document.getElementById('activeIndicator');
-  activeContainer.style.display = 'flex'; // Always visible now
 
   if (isEffectivelyActive) {
     document.getElementById('activeDomain').innerText = state.activeDomain;
-    document.getElementById('activeDomain').style.color = 'var(--text-main)';
+    document.getElementById('activeDomain').style.color = 'var(--neon-cyan)';
     document.getElementById('activeTime').innerText = formatTime(totals[state.activeDomain] || 0);
   } else {
     // If tracking is paused or looking at an internal page
     if (state.activeDomain) {
-      document.getElementById('activeDomain').innerText = `${state.activeDomain} (Paused)`;
+      document.getElementById('activeDomain').innerText = `${state.activeDomain} [PAUSED]`;
       document.getElementById('activeDomain').style.color = 'var(--text-muted)';
       document.getElementById('activeTime').innerText = formatTime(totals[state.activeDomain] || 0);
     } else {
-      document.getElementById('activeDomain').innerText = `Untracked page`;
+      document.getElementById('activeDomain').innerText = `[UNTRACKED]`;
       document.getElementById('activeDomain').style.color = 'var(--text-muted)';
       document.getElementById('activeTime').innerText = `-`;
     }
   }
 
-  const sortedDomains = Object.keys(totals).sort((a, b) => totals[b] - totals[a]);
-  const maxTime = sortedDomains.length > 0 ? totals[sortedDomains[0]] : 1;
+  // Handle sorting
+  let sortedDomains = Object.keys(totals);
+  if (currentSort === 'timeDesc') {
+    sortedDomains.sort((a, b) => totals[b] - totals[a]);
+  } else if (currentSort === 'timeAsc') {
+    sortedDomains.sort((a, b) => totals[a] - totals[b]);
+  } else if (currentSort === 'alpha') {
+    sortedDomains.sort((a, b) => a.localeCompare(b));
+  }
+
+  // The progress bar percentages should always be relative to the max time in the whole session
+  const maxTime = Math.max(...Object.values(totals), 1);
 
   const statsContainer = document.getElementById('statsContainer');
   
   if (sortedDomains.length === 0) {
-    statsContainer.innerHTML = '<div style="color: var(--text-muted); font-size: 13px; text-align: center; padding: 20px 0;">No active browsing yet.</div>';
+    statsContainer.innerHTML = '<div style="color: var(--text-muted); font-size: 11px; text-align: center; padding: 20px 0;">[ NO_DATA_DETECTED ]</div>';
     return;
   }
 
@@ -123,7 +137,6 @@ async function renderUI() {
   // Remove missing domains
   Array.from(statsContainer.children).forEach(child => {
     const childDomain = child.id.replace('domain-', '');
-    // Using explicit undefined check to prevent elements with 0 seconds from disappearing
     if (totals[childDomain] === undefined && child.className === 'stat-item') {
       child.remove();
     }
