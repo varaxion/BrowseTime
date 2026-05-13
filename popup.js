@@ -47,7 +47,7 @@ async function renderUI() {
 
   // Format session start time
   const startTime = new Date(state.sessionStartTime || now);
-  document.getElementById('sessionStart').innerText = `Started: ${startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+  document.getElementById('sessionStart').innerText = `Started: ${startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}`;
 
   const activeContainer = document.getElementById('activeIndicator');
   activeContainer.style.display = 'flex'; // Always visible now
