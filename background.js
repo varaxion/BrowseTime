@@ -39,15 +39,15 @@ function getDomain(url) {
   }
 }
 
-async function processStateChange() {
+async function processStateChange(updates = {}) {
   const now = Date.now();
   
-  const isEffectivelyActive = sessionState.activeDomain && 
-                              sessionState.windowFocused && 
-                              (!sessionState.isIdle || sessionState.isActiveTabAudible);
+  // 1. Calculate and aggregate elapsed time using PREVIOUS state
+  const wasEffectivelyActive = sessionState.activeDomain && 
+                               sessionState.windowFocused && 
+                               (!sessionState.isIdle || sessionState.isActiveTabAudible);
 
-  // 1. Calculate and aggregate elapsed time
-  if (isEffectivelyActive) {
+  if (wasEffectivelyActive) {
     const elapsedSeconds = Math.floor((now - sessionState.lastTimestamp) / 1000);
     
     // Safety limit: if elapsed time is unrealistically large (> 24 hours), ignore it
@@ -59,21 +59,33 @@ async function processStateChange() {
     }
   }
 
-  // 2. Determine new active domain and audible state
+  // 2. Apply state updates from the event BEFORE determining the new domain
+  if (updates.windowFocused !== undefined) {
+    sessionState.windowFocused = updates.windowFocused;
+  }
+  if (updates.isIdle !== undefined) {
+    sessionState.isIdle = updates.isIdle;
+  }
+
+  // 3. Determine new active domain and audible state
   let newDomain = null;
   let newAudible = false;
   
   try {
-    const tabs = await chrome.tabs.query({ active: true, lastFocusedWindow: true, windowType: 'normal' });
-    if (tabs.length > 0 && !tabs[0].incognito) {
-      newAudible = tabs[0].audible || false;
-      newDomain = getDomain(tabs[0].url);
+    // Get the last focused normal window (ignores extension popups)
+    const window = await chrome.windows.getLastFocused({ populate: true, windowTypes: ['normal'] });
+    if (window && window.tabs) {
+      const activeTab = window.tabs.find(t => t.active);
+      if (activeTab && !activeTab.incognito) {
+        newAudible = activeTab.audible || false;
+        newDomain = getDomain(activeTab.url);
+      }
     }
   } catch (e) {
-    console.error("Error querying tabs:", e);
+    console.error("Error querying windows:", e);
   }
 
-  // 3. Update state
+  // 4. Update state
   sessionState.activeDomain = newDomain;
   sessionState.isActiveTabAudible = newAudible;
   sessionState.lastTimestamp = now;
@@ -91,21 +103,13 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 });
 
 chrome.windows.onFocusChanged.addListener((windowId) => {
-  if (windowId === chrome.windows.WINDOW_ID_NONE) {
-    sessionState.windowFocused = false;
-  } else {
-    sessionState.windowFocused = true;
-  }
-  processStateChange();
+  const isFocused = (windowId !== chrome.windows.WINDOW_ID_NONE);
+  processStateChange({ windowFocused: isFocused });
 });
 
 chrome.idle.onStateChanged.addListener((newState) => {
-  if (newState === 'active') {
-    sessionState.isIdle = false;
-  } else {
-    sessionState.isIdle = true;
-  }
-  processStateChange();
+  const isIdle = (newState !== 'active');
+  processStateChange({ isIdle: isIdle });
 });
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
