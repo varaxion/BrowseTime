@@ -3,9 +3,9 @@
   <p><em>Privacy-first browser awareness. Track time, not people.</em></p>
   
   <p>
-    <img src="https://img.shields.io/badge/Architecture-Manifest_V3-00f3ff?style=for-the-badge&logo=googlechrome&logoColor=white&labelColor=050510" alt="Chrome MV3" />
-    <img src="https://img.shields.io/badge/Stack-Vanilla_JS-b026ff?style=for-the-badge&logo=javascript&logoColor=white&labelColor=050510" alt="Vanilla JS" />
-    <img src="https://img.shields.io/badge/Data-100%25_Local-00f3ff?style=for-the-badge&logo=databricks&logoColor=white&labelColor=050510" alt="Local Data" />
+    <img src="https://img.shields.io/badge/Architecture-Manifest%20V3-blue?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Chrome MV3" />
+    <img src="https://img.shields.io/badge/Stack-Vanilla%20JS-yellow?style=for-the-badge&logo=javascript&logoColor=black" alt="Vanilla JS" />
+    <img src="https://img.shields.io/badge/Data-100%25%20Local-brightgreen?style=for-the-badge&logo=databricks&logoColor=white" alt="Local Data" />
   </p>
 </div>
 
@@ -67,8 +67,8 @@ The BrowseTime engine runs purely in the background via a sophisticated, race-co
   <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/aqua.png" width="400" alt="cyan glowing line separator" />
   <br /><br />
   <code><b>[ SYS.BROWSETIME ]</b></code>
-  <br /><br />
-  <sub>✦ Engineered by <a href="https://github.com/varaxion"><b>Varaxion</b></a> ✦</sub>
-  <br /><br />
+  <br />
+  <h3>✦ Engineered by <a href="https://github.com/varaxion">Varaxion</a> ✦</h3>
+  <br />
   <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/aqua.png" width="400" alt="cyan glowing line separator" />
 </div>
