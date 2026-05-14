@@ -3,6 +3,9 @@
   <p><em>Privacy-first browser awareness. Track time, not people.</em></p>
 </div>
 
+> 🚧 **STATUS: ACTIVE DEVELOPMENT**  
+> BrowseTime is currently an actively evolving project. Expect rapid architectural updates, expanded tracking logic, and new glassmorphic UI features in upcoming iterations.
+
 <br />
 
 ## ⚡ Overview
@@ -40,8 +43,13 @@ The BrowseTime engine runs purely in the background via a sophisticated, race-co
 4. Click **Load unpacked** and select the root `BrowseTime` directory.
 5. Pin the extension to your toolbar and start monitoring!
 
----
+<br />
 
 <div align="center">
-  <p>Engineered by <a href="https://github.com/varaxion">Varaxion</a></p>
+  <hr style="width: 50%; border: 1px solid #333;" />
+  <br />
+  <code><b>[ SYS.BROWSETIME ]</b></code>
+  <br />
+  <br />
+  <sub>✦ Engineered by <a href="https://github.com/varaxion"><b>Varaxion</b></a> ✦</sub>
 </div>
