@@ -1,55 +1,74 @@
 <div align="center">
   <h1>BrowseTime</h1>
   <p><em>Privacy-first browser awareness. Track time, not people.</em></p>
+  
+  <p>
+    <img src="https://img.shields.io/badge/Architecture-Manifest_V3-00f3ff?style=for-the-badge&logo=googlechrome&logoColor=white&labelColor=050510" alt="Chrome MV3" />
+    <img src="https://img.shields.io/badge/Stack-Vanilla_JS-b026ff?style=for-the-badge&logo=javascript&logoColor=white&labelColor=050510" alt="Vanilla JS" />
+    <img src="https://img.shields.io/badge/Data-100%25_Local-00f3ff?style=for-the-badge&logo=databricks&logoColor=white&labelColor=050510" alt="Local Data" />
+  </p>
 </div>
 
-> 🚧 **STATUS: ACTIVE DEVELOPMENT**  
+> 🚧 **[ STATUS: ACTIVE DEVELOPMENT ]**  
 > BrowseTime is currently an actively evolving project. Expect rapid architectural updates, expanded tracking logic, and new glassmorphic UI features in upcoming iterations.
 
 <br />
 
 ## ⚡ Overview
 
-**BrowseTime** is a lightweight, privacy-focused Chrome extension engineered to precisely monitor your active browser usage. It operates on a strict "active attention" philosophy—tracking time only when you are genuinely focused on a website. With zero telemetry, zero cloud sync, and ephemeral local storage, BrowseTime ensures your data belongs exclusively to you and vanishes the moment your browser closes.
+**BrowseTime** is a lightweight, privacy-focused Chrome extension engineered to precisely monitor your active browser usage. It operates on a strict **"active attention"** philosophy—tracking time only when you are genuinely focused on a website. With zero telemetry, zero cloud sync, and ephemeral local storage, BrowseTime ensures your data belongs exclusively to you and vanishes the moment your browser closes.
 
-## 🚀 Key Features
+<br />
 
-- **Surgical Accuracy:** Intelligently pauses tracking when the browser is minimized, loses OS focus, or when you step away from your keyboard.
-- **Media Awareness:** Fully aware of your media consumption. Watching a long video without touching the mouse? BrowseTime tracks the tab's `audible` state to ensure your time is logged seamlessly.
-- **Glassmorphic Cyber UI:** A stunning, hacker-inspired live monitoring dashboard featuring animated deep mesh gradients, frosted glass panels, and neon typography.
-- **Real-Time Dynamic Sorting:** Butter-smooth live rendering that allows you to sort tracked domains by `Time (Desc)`, `Time (Asc)`, or `A-Z` without interrupting the live ticker.
-- **Absolute Privacy:** Utilizes Manifest V3's volatile `chrome.storage.session`. No persistent databases, no tracking cookies, and absolutely no external network requests.
+## 🚀 System Features
+
+- 🎯 **Surgical Accuracy:** Intelligently pauses tracking when the browser is minimized, loses OS focus, or when you step away from your keyboard.
+- 🎧 **Media Awareness:** Fully aware of your media consumption. Watching a long video without touching the mouse? BrowseTime tracks the tab's `audible` state to ensure your time is logged seamlessly.
+- 🔮 **Glassmorphic Cyber UI:** A stunning, hacker-inspired live monitoring dashboard featuring animated deep mesh gradients, frosted glass panels, and glowing neon typography.
+- ⚡ **Real-Time Dynamic Sorting:** Butter-smooth live rendering allows you to dynamically sort tracked domains by `Time (Desc)`, `Time (Asc)`, or `A-Z` without interrupting the live ticker.
+- 🛡️ **Absolute Privacy:** Utilizes Manifest V3's volatile `chrome.storage.session`. No persistent databases, no tracking cookies, and absolutely **no external network requests**.
+
+<br />
 
 ## 🛠️ Technology Stack
 
-- **Architecture:** Chrome Extension Manifest V3
-- **Logic:** Vanilla JavaScript (ES6+)
-- **Styling:** Custom CSS3 (Backdrop-filters, CSS variables, keyframe animations)
-- **APIs Used:** `chrome.tabs`, `chrome.windows`, `chrome.idle`, `chrome.storage.session`, `chrome.runtime`
+| Category | Technology |
+| :--- | :--- |
+| **Architecture** | Chrome Extension Manifest V3 |
+| **Logic** | Vanilla JavaScript (ES6+) |
+| **Styling** | Custom CSS3 (Backdrop-filters, CSS variables, Keyframes) |
+| **APIs** | `tabs`, `windows`, `idle`, `storage.session`, `runtime` |
 
-## ⚙️ How It Works
+<br />
+
+## ⚙️ Core Architecture
 
 The BrowseTime engine runs purely in the background via a sophisticated, race-condition-immune state machine:
-1. **Focus Tracking:** Listens to OS-level window transitions to guarantee the browser is actively targeted.
-2. **Idle Detection:** Uses the `chrome.idle` API to detect system idleness.
-3. **State Management:** Aggregates elapsed time against the active domain and caches the session asynchronously. 
-4. **Popup Bridge:** When the stats panel is opened, an active `chrome.runtime.Port` establishes a direct connection to guarantee the background tracker doesn't falsely pause.
 
-## 💻 Installation (Developer Mode)
+1. **Focus Tracking:** Listens to OS-level window transitions to guarantee the browser is actively targeted.
+2. **Idle Detection:** Leverages the `chrome.idle` API to detect system idleness.
+3. **State Management:** Aggregates elapsed time against the active domain and securely caches the session asynchronously. 
+4. **Popup Bridge:** When the stats panel is opened, an active `chrome.runtime.Port` establishes a direct connection to guarantee the background tracker accurately evaluates focus states.
+
+<br />
+
+## 💻 Developer Installation
 
 1. Clone this repository to your local machine.
 2. Open Chrome/Chromium and navigate to `chrome://extensions/`.
 3. Enable **Developer mode** via the toggle in the top right.
 4. Click **Load unpacked** and select the root `BrowseTime` directory.
-5. Pin the extension to your toolbar and start monitoring!
+5. Pin the extension to your toolbar and initialize the monitoring!
 
+<br />
 <br />
 
 <div align="center">
-  <hr style="width: 50%; border: 1px solid #333;" />
-  <br />
+  <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/aqua.png" width="400" alt="cyan glowing line separator" />
+  <br /><br />
   <code><b>[ SYS.BROWSETIME ]</b></code>
-  <br />
-  <br />
+  <br /><br />
   <sub>✦ Engineered by <a href="https://github.com/varaxion"><b>Varaxion</b></a> ✦</sub>
+  <br /><br />
+  <img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/aqua.png" width="400" alt="cyan glowing line separator" />
 </div>
